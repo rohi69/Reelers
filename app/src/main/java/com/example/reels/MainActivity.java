@@ -11,6 +11,9 @@ import androidx.core.view.WindowInsetsCompat;
 import com.example.reels.adapters.reel_adapter;
 import com.example.reels.databinding.ActivityMainBinding;
 import com.example.reels.models.reel_model;
+import com.google.firebase.database.DatabaseKt;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 
@@ -43,9 +46,13 @@ public class MainActivity extends AppCompatActivity {
 
         reel_adapter reelAdapter = new reel_adapter(this , arr);
         binding.viewPager.setAdapter(reelAdapter);
-        reelAdapter.notifyDataSetChanged();
 
 
+
+      DatabaseReference userRef =  FirebaseDatabase.getInstance().getReference("Users");
+      userRef.setValue("Rohit");
+      userRef.setValue("Prateek");
+      userRef.setValue("Rahul");
 
 
 
