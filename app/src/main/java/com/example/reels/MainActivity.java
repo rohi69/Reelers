@@ -45,6 +45,11 @@ public class MainActivity extends AppCompatActivity {
         binding.viewPager.setAdapter(reelAdapter);
         reelAdapter.notifyDataSetChanged();
 
+
+
+
+
+
     }
 
     @Override
@@ -52,4 +57,5 @@ public class MainActivity extends AppCompatActivity {
         super.onBackPressed();
         finishAffinity();
     }
+
 }
