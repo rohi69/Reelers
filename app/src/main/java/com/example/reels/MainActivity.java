@@ -50,9 +50,12 @@ public class MainActivity extends AppCompatActivity {
 
 
       DatabaseReference userRef =  FirebaseDatabase.getInstance().getReference("Users");
-      userRef.setValue("Rohit");
-      userRef.setValue("Prateek");
-      userRef.setValue("Rahul");
+      userRef.push().setValue("Rohit");
+      userRef.push().setValue("Prateek");
+      userRef.push().setValue("Rahul");
+
+      String id  = userRef.push().getKey();
+      userRef.child("Rohit").setValue("topwal");
 
 
 

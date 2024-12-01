@@ -16,7 +16,7 @@ import java.util.ArrayList;
 
 public class myDBhelper extends SQLiteOpenHelper {
     public static  final String LOGINTABLE = "login";
-    public static final String EMAIL = "email";
+    public static final String PHONE = "phone";
     public static  final String PASS = "password";
 
 
@@ -26,7 +26,7 @@ public class myDBhelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("create table "+ LOGINTABLE + "("+EMAIL +" text primary key , "+PASS +" text )");
+        db.execSQL("create table "+ LOGINTABLE + "("+PHONE +" text primary key , "+PASS +" text )");
     }
 
     @Override
@@ -35,10 +35,10 @@ public class myDBhelper extends SQLiteOpenHelper {
     }
 
 
-    public void addData(String Email, String Pass) {
+    public void addData(String phone, String Pass) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(EMAIL, Email);
+        values.put(PHONE, phone);
         values.put(PASS, Pass);
         db.insert(LOGINTABLE, null, values);
 
@@ -61,7 +61,7 @@ public class myDBhelper extends SQLiteOpenHelper {
 
     public boolean emailExists(String Email){
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery("select * from "+LOGINTABLE +" where " + EMAIL + " =? " , new String[]{Email});
+        Cursor cursor = db.rawQuery("select * from "+LOGINTABLE +" where " + PHONE + " =? " , new String[]{Email});
          boolean exists = cursor.getCount()>0;
          cursor.close();
 

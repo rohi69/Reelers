@@ -13,8 +13,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="12dp"
-        android:id="@+id/etGmail"
-        android:hint="Enter Your email"
+        android:id="@+id/etPhone"
+        android:hint="Enter phone nuber"
         android:inputType="text"/>
 
     <EditText

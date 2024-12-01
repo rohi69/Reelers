@@ -38,18 +38,18 @@ public class logInActivity extends AppCompatActivity {
         binding.logInBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String Email = binding.etGmail.getText().toString();
+                String phone = binding.etPhone.getText().toString();
                 String Password = binding.etPassword.getText().toString();
                 ArrayList<logIn_model> arr = database.fetchData();
                  boolean isValid = false;
 
-               if(Email.isEmpty() || Password.isEmpty()){
-                   Toast.makeText(logInActivity.this, "Email or password can't be empty", Toast.LENGTH_SHORT).show();
+               if(phone.isEmpty() || Password.isEmpty()){
+                   Toast.makeText(logInActivity.this, "Phone number or password can't be empty", Toast.LENGTH_SHORT).show();
                    return;
                }
 
                for(int i = 0 ;i<arr.size();i++){
-                   if(arr.get(i).getEmail().equals(Email) && arr.get(i).getPass().equals(Password)){
+                   if(arr.get(i).getPhone().equals(phone) && arr.get(i).getPass().equals(Password)){
                        isValid = true;
                        break;
                    }

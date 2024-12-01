@@ -43,11 +43,13 @@ dependencies {
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
     implementation("de.hdodenhof:circleimageview:3.1.0")
-    implementation(platform("com.google.firebase:firebase-bom:33.6.0"))
 
-    // Firebase dependencies
+    implementation(platform("com.google.firebase:firebase-bom:33.6.0"))
     implementation("com.google.firebase:firebase-analytics")
-    implementation("com.google.firebase:firebase-messaging:24.3.0")
-    implementation("com.google.firebase:firebase-database:20.3.3")
-    implementation("com.google.firebase:firebase-auth")
+
+    implementation("com.google.firebase:firebase-database")
+
+
+
+
 }

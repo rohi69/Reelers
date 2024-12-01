@@ -1,11 +1,11 @@
 package com.example.reels.models;
 
 public class logIn_model {
-    String Email , Pass;
+    String Phone , Pass;
 
-    public logIn_model(String email, String pass) {
+    public logIn_model(String phone , String pass) {
         Pass = pass;
-        Email = email;
+        Phone = phone;
     }
 
     public String getPass() {
@@ -16,11 +16,11 @@ public class logIn_model {
         Pass = pass;
     }
 
-    public String getEmail() {
-        return Email;
+    public String getPhone() {
+        return Phone;
     }
 
-    public void setEmail(String email) {
-        Email = email;
+    public void setPhone(String phone) {
+        Phone = phone;
     }
 }
