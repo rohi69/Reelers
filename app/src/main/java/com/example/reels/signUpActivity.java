@@ -1,29 +1,35 @@
 package com.example.reels;
 
-import android.Manifest;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.telephony.SmsManager;
-import android.view.View;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.reels.databinding.ActivitySignUpBinding;
+import com.google.firebase.FirebaseException;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.PhoneAuthCredential;
+import com.google.firebase.auth.PhoneAuthOptions;
+import com.google.firebase.auth.PhoneAuthProvider;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
-import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 public class signUpActivity extends AppCompatActivity {
     ActivitySignUpBinding binding;
+    FirebaseAuth mAuth;
+    DatabaseReference databaseReference;
+    String verificationId;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -37,63 +43,109 @@ public class signUpActivity extends AppCompatActivity {
             return insets;
         });
 
-        myDBhelper database = new myDBhelper(this);
-        Intent in = new Intent(signUpActivity.this , MainActivity.class);
 
-        binding.sendOtp.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Random random = new Random();
-                int otp = random.nextInt(9000)+1000;
-                String phone = binding.etPhone.getText().toString();
-                if(ContextCompat.checkSelfPermission(signUpActivity.this , Manifest.permission.SEND_SMS)== PackageManager.PERMISSION_GRANTED){
-                    sendOtp(phone , otp);
-                }else{
-                    ActivityCompat.requestPermissions(signUpActivity.this , new String[]{Manifest.permission.SEND_SMS},otp);
-                }
-                 if (binding.etOtp != null){
-                      otp = Integer.parseInt(binding.etOtp.getText().toString());
-                      binding.etPassword.setVisibility(View.VISIBLE);
-                      binding.signUpBtn.setVisibility(View.VISIBLE);
-                 }
+        mAuth = FirebaseAuth.getInstance();
+        databaseReference = FirebaseDatabase.getInstance().getReference("users"); // Point to "users" node in database
+
+        // Send OTP button
+        binding.sendOtp.setOnClickListener(view -> {
+            String phoneNumber = binding.etPhone.getText().toString();
+
+            if (phoneNumber.isEmpty() || phoneNumber.length() < 10) {
+                Toast.makeText(signUpActivity.this, "Enter a valid phone number", Toast.LENGTH_SHORT).show();
+                return;
             }
+
+            sendOtp(phoneNumber);
         });
 
-        binding.signUpBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String phone = binding.etPhone.getText().toString();
-                String Password = binding.etPassword.getText().toString();
-                 if(database.emailExists(phone)) {
-                     Toast.makeText(signUpActivity.this, "Email is already is use", Toast.LENGTH_SHORT).show();
-                 }else{
-                     database.addData(phone, Password);
-                     SharedPreferences pref = getSharedPreferences("login" , MODE_PRIVATE);
-                     SharedPreferences.Editor editor = pref.edit();
-                     editor.putBoolean("flag" , true);
-                     editor.apply();
-                     startActivity(in);
-                 }
+        // Validate OTP button
+        binding.validateOtpBtn.setOnClickListener(view -> {
+            String userOtp = binding.etOtp.getText().toString().trim();
+
+            if (userOtp.isEmpty() || userOtp.length() < 6) {
+                Toast.makeText(signUpActivity.this, "Enter a valid OTP", Toast.LENGTH_SHORT).show();
+                return;
             }
+
+            validateOtp(userOtp);
         });
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            sendOtp(binding.etPhone.getText().toString(), requestCode);
-        } else {
-            Toast.makeText(this, "Permission Denied", Toast.LENGTH_SHORT).show();
+
+
+    // Method to send OTP
+    private void sendOtp(String phoneNumber) {
+        PhoneAuthOptions options = PhoneAuthOptions.newBuilder(mAuth)
+                .setPhoneNumber("+91" + phoneNumber) // Ensure the phone number includes the country code
+                .setTimeout(60L, TimeUnit.SECONDS)  // Timeout duration for OTP
+                .setActivity(this)                 // Current activity
+                .setCallbacks(new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
+                    @Override
+                    public void onVerificationCompleted(@NonNull PhoneAuthCredential credential) {
+                        // Auto-verification completed (OTP may be auto-filled)
+                        Log.d("Firebase", "Verification completed: " + credential);
+                    }
+
+                    @Override
+                    public void onVerificationFailed(@NonNull FirebaseException e) {
+                        // Verification failed
+                        Log.e("Firebase", "Verification failed: " + e.getMessage());
+                        Toast.makeText(signUpActivity.this, "Failed to send OTP: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+
+                    }
+
+                    @Override
+                    public void onCodeSent(@NonNull String verificationId, @NonNull PhoneAuthProvider.ForceResendingToken token) {
+                        // OTP sent successfully
+                        Log.d("Firebase", "OTP sent: " + verificationId);
+                        Toast.makeText(signUpActivity.this, "OTP sent successfully", Toast.LENGTH_SHORT).show();
+                        signUpActivity.this.verificationId = verificationId; // Save the verification ID
+                    }
+                })
+                .build();
+
+        PhoneAuthProvider.verifyPhoneNumber(options);
+    }
+
+    // Method to validate OTP
+    private void validateOtp(String userOtp) {
+        if (verificationId == null) {
+            Toast.makeText(this, "Verification ID is null. Send OTP first.", Toast.LENGTH_SHORT).show();
+            return;
         }
+
+        PhoneAuthCredential credential = PhoneAuthProvider.getCredential(verificationId, userOtp);
+        signInWithPhoneAuthCredential(credential);
     }
 
+    // Sign in with the verified credential
+    private void signInWithPhoneAuthCredential(PhoneAuthCredential credential) {
+        mAuth.signInWithCredential(credential).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                // Save the phone number to Firebase Realtime Database
+                String phoneNumber = binding.etPhone.getText().toString().trim();
 
-    private void sendOtp(String phone , int otp){
-        SmsManager smsManager = SmsManager.getDefault();
-        smsManager.sendTextMessage("91"+phone , null , "Your otp for sign up :"+otp , null , null );
+                // Navigate to UserActivity after successful OTP verification
+                Toast.makeText(signUpActivity.this, "OTP Verified! Redirecting...", Toast.LENGTH_SHORT).show();
+
+                Intent intent = new Intent(signUpActivity.this, userSignUpActivity.class);
+                startActivity(intent);
+
+                SharedPreferences pref = getSharedPreferences("login" , MODE_PRIVATE);
+                SharedPreferences.Editor editor = pref.edit();
+                editor.putBoolean("flag" , true);
+                editor.putString("phoneNumber" , phoneNumber);
+                editor.apply();
+
+            } else {
+
+                Toast.makeText(signUpActivity.this, "Invalid OTP. Try again.", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
 
 }
+

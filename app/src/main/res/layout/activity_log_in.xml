@@ -23,7 +23,7 @@
         android:layout_margin="12dp"
         android:id="@+id/etPassword"
         android:hint="Enter your password"
-        android:inputType="text"/>
+        android:inputType="textPassword"/>
 
     <Button
         android:layout_width="wrap_content"

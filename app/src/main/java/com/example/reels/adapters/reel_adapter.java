@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.reels.DummyProfile;
 import com.example.reels.MainActivity;
 import com.example.reels.R;
 import com.example.reels.databinding.ReelLayoutBinding;
@@ -57,17 +58,15 @@ public class reel_adapter extends RecyclerView.Adapter<reel_adapter.viewHolder> 
             }
         });
 
-        holder.binding.profileImageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent in = new Intent(context , profileActivity.class);
-                context.startActivity(in);
-            }
-        });
+
         holder.binding.userName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent in = new Intent(context , profileActivity.class);
+                Intent in = new Intent(context , DummyProfile.class);
+                String userName = holder.binding.userName.getText().toString();
+                 in.putExtra("user" , userName);
+                 in.putExtra("videoUrl" , arr.get(position).getUrl());
+
                 context.startActivity(in);
             }
         });

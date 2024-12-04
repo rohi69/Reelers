@@ -2,7 +2,15 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.SEND_SMS" />
+    <uses-permission android:name="android.permission.RECEIVE_SMS" />
+    <uses-permission android:name="android.permission.READ_SMS" />
+
+    <uses-feature
+        android:name="android.hardware.telephony"
+        android:required="false" />
+
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
@@ -16,6 +24,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Reels"
         tools:targetApi="31">
+        <activity
+            android:name=".DummyProfile"
+            android:exported="false" />
+        <activity
+            android:name=".userSignUpActivity"
+            android:exported="false" />
         <activity
             android:name=".profileActivity"
             android:exported="false" />
